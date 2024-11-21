@@ -1,0 +1,27 @@
+﻿<Window x:Class="delete.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:delete"
+        mc:Ignorable="d"
+        Title="DataObliterate" Height="450" Width="800">
+    <Grid Cursor="Arrow">
+        <StackPanel Margin="0,-1,0,1">
+            <Label x:Name="lblList" Content="archivos y carpetas que se eliminarán"/>
+            <ListBox x:Name="listBox" Height="100" d:ItemsSource="{d:SampleData ItemCount=5}"/>
+            <Button x:Name="buttonBrowse" Content="seleccionar archivos" Click="buttonBrowse_Click"/>
+            <Button x:Name="buttonBrowseFolder" Content="seleccionar carpetas" Click="buttonBrowseFolder_Click"/>
+        </StackPanel>
+        <StackPanel>
+            <RadioButton x:Name="radioButtonSimple" Content="método simple(sobreescritura con ceros)" GroupName="deleteGroup" IsChecked="True"/>
+            <RadioButton x:Name="radioButtonGutman" Content="método Gutman(sobreescritura aleatoria de 35 pasos)" GroupName="deleteGroup"/>
+        </StackPanel>
+        <StackPanel>
+            <Button x:Name="buttonDelete" Content="eliminar" Click="buttonDelete_Click"/>
+            <Button x:Name="buttonAbout" Content="acerca de"/>
+            <Button x:Name="buttonCancel" Content="cancelar" IsCancel="True" Click="buttonCancel_Click"/>
+        </StackPanel>
+        <ProgressBar x:Name="progressBar" Height="10" Width="100" Cursor="Arrow" Margin="350,212,350,212" Visibility="Collapsed"/>
+    </Grid>
+</Window>
