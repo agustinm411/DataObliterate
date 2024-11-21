@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 
 namespace delete
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public ObservableCollection<string> Files { get; set; }
@@ -29,7 +26,7 @@ namespace delete
                 {
                     foreach (string file in selectedFiles)
                     {
-                        if (!Files.Contains(file)) // Prevent duplicate entries
+                        if (!Files.Contains(file))  
                         {
                             Files.Add(file);
                         }
@@ -51,7 +48,7 @@ namespace delete
                 {
                     foreach (string folder in selectedFolders)
                     {
-                        if (!Files.Contains(folder)) // Prevent duplicate entries
+                        if (!Files.Contains(folder))
                         {
                             Files.Add(folder);
                         }
@@ -82,6 +79,15 @@ namespace delete
                         MessageBox.Show("No hay archivos para eliminar.");
                         return;
                     }
+
+
+                    buttonBrowse.Visibility = Visibility.Collapsed;
+                    buttonBrowseFolder.Visibility = Visibility.Collapsed;
+                    radioButtonSimple.Visibility = Visibility.Collapsed;
+                    radioButtonGutman.Visibility = Visibility.Collapsed;
+                    buttonDelete.Visibility = Visibility.Collapsed;
+                    listBox.Visibility = Visibility.Collapsed;
+
                     buttonCancel.Visibility = Visibility.Visible;
                     progressBar.Minimum = 0;
                     progressBar.Maximum = totalItems;
@@ -131,6 +137,12 @@ namespace delete
 
                     progressBar.Visibility = Visibility.Collapsed;
                     buttonCancel.Visibility = Visibility.Collapsed;
+                    buttonBrowse.Visibility = Visibility.Visible;
+                    buttonBrowseFolder.Visibility = Visibility.Visible;
+                    radioButtonSimple.Visibility = Visibility.Visible;
+                    radioButtonGutman.Visibility = Visibility.Visible;
+                    buttonDelete.Visibility = Visibility.Visible;
+                    listBox.Visibility = Visibility.Visible;
 
                     if (!wasCancelled)
                     {
@@ -144,15 +156,17 @@ namespace delete
             }
         }
 
-
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
             _cancellationTokenSource?.Cancel();
             progressBar.Visibility = Visibility.Collapsed;
             MessageBox.Show("Eliminación cancelada.");
+            buttonBrowse.Visibility = Visibility.Visible;
+            buttonBrowseFolder.Visibility = Visibility.Visible;
+            radioButtonSimple.Visibility = Visibility.Visible;
+            radioButtonGutman.Visibility = Visibility.Visible;
+            buttonDelete.Visibility = Visibility.Visible;
+            listBox.Visibility = Visibility.Visible;
         }
-               
-                
-        
     }
 }
