@@ -3,7 +3,7 @@ using System.Data;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace delete
+namespace DataObliterate
 {
     /// <summary>
     /// Interaction logic for App.xaml

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.Windows;
 
-namespace delete
+namespace DataObliterate
 {
     public static class DialogService
     {

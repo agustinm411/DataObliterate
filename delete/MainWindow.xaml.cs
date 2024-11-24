@@ -3,7 +3,7 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace delete
+namespace DataObliterate
 {
     public partial class MainWindow : Window
     {
@@ -79,22 +79,10 @@ namespace delete
                         MessageBox.Show("No hay archivos para eliminar.");
                         return;
                     }
-
-
-                    buttonBrowse.Visibility = Visibility.Collapsed;
-                    buttonBrowseFolder.Visibility = Visibility.Collapsed;
-                    radioButtonSimple.Visibility = Visibility.Collapsed;
-                    radioButtonGutman.Visibility = Visibility.Collapsed;
-                    buttonDelete.Visibility = Visibility.Collapsed;
-                    listBox.Visibility = Visibility.Collapsed;
-
-                    buttonCancel.Visibility = Visibility.Visible;
-                    progressBar.Minimum = 0;
-                    progressBar.Maximum = totalItems;
-                    progressBar.Value = 0;
-                    progressBar.Visibility = Visibility.Visible;
-
+                    UIUpdate uIUpdate = new UIUpdate();
+                    uIUpdate .PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
                     bool wasCancelled = false;
+                    var deletedFiles = new List<string>();
 
                     await Task.Run(() =>
                     {
@@ -129,22 +117,20 @@ namespace delete
 
                             Dispatcher.Invoke(() =>
                             {
+                                deletedFiles.Add(file);
                                 Files.Remove(file);
                                 progressBar.Value = i + 1;
                             });
                         }
                     }, _cancellationTokenSource.Token);
 
-                    progressBar.Visibility = Visibility.Collapsed;
-                    buttonCancel.Visibility = Visibility.Collapsed;
-                    buttonBrowse.Visibility = Visibility.Visible;
-                    buttonBrowseFolder.Visibility = Visibility.Visible;
-                    radioButtonSimple.Visibility = Visibility.Visible;
-                    radioButtonGutman.Visibility = Visibility.Visible;
-                    buttonDelete.Visibility = Visibility.Visible;
-                    listBox.Visibility = Visibility.Visible;
+                    uIUpdate .RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
 
-                    if (!wasCancelled)
+                    if (wasCancelled)
+                    {
+                        MessageBox.Show("Eliminación cancelada.");
+                    }
+                    else
                     {
                         MessageBox.Show("Eliminación completada.");
                     }
