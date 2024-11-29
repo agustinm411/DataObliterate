@@ -13,6 +13,7 @@ namespace DataObliterate
     {
         public void PrepareUIForDeletion(Button buttonBrowse, Button buttonBrowseFolder, RadioButton radioButtonSimple, RadioButton radioButtonGutman, Button buttonDelete, ListBox listBox, Button buttonCancel, ProgressBar progressBar, ObservableCollection<string> files)
         {
+            MessageBox.Show(files.Count.ToString());
             buttonBrowse.Visibility = Visibility.Collapsed;
             buttonBrowseFolder.Visibility = Visibility.Collapsed;
             radioButtonSimple.Visibility = Visibility.Collapsed;

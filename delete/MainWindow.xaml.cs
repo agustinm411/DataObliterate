@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DataObliterate
 {
@@ -15,6 +16,7 @@ namespace DataObliterate
             Files = new ObservableCollection<string>();
             listBox.ItemsSource = Files;
             buttonCancel.Visibility = Visibility.Collapsed;
+//progressLabel.Visibility= Visibility.Collapsed;
         }
 
         private void buttonBrowse_Click(object sender, RoutedEventArgs e)
@@ -26,7 +28,7 @@ namespace DataObliterate
                 {
                     foreach (string file in selectedFiles)
                     {
-                        if (!Files.Contains(file))  
+                        if (!Files.Contains(file))
                         {
                             Files.Add(file);
                         }
@@ -69,72 +71,61 @@ namespace DataObliterate
             try
             {
                 bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?");
-                if (isConfirmed)
+                if (!isConfirmed) return;
+
+                var itemsToRemove = new List<string>(Files);
+                if (itemsToRemove.Count == 0)
                 {
-                    var itemsToRemove = new List<string>(Files);
-                    int totalItems = itemsToRemove.Count;
-
-                    if (totalItems == 0)
-                    {
-                        MessageBox.Show("No hay archivos para eliminar.");
-                        return;
-                    }
-                    UIUpdate uIUpdate = new UIUpdate();
-                    uIUpdate .PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
-                    bool wasCancelled = false;
-                    var deletedFiles = new List<string>();
-
-                    await Task.Run(() =>
-                    {
-                        DeletionService deletion = new DeletionService();
-                        for (int i = 0; i < totalItems; i++)
-                        {
-                            if (_cancellationTokenSource.Token.IsCancellationRequested)
-                            {
-                                wasCancelled = true;
-                                break;
-                            }
-
-                            string file = itemsToRemove[i];
-
-                            bool isSimpleChecked = false;
-                            bool isGutmanChecked = false;
-
-                            Dispatcher.Invoke(() =>
-                            {
-                                isSimpleChecked = radioButtonSimple.IsChecked == true;
-                                isGutmanChecked = radioButtonGutman.IsChecked == true;
-                            });
-
-                            if (isSimpleChecked)
-                            {
-                                deletion.DeleteFiles(file);
-                            }
-                            else if (isGutmanChecked)
-                            {
-                                deletion.GutmanDeleteFiles(file);
-                            }
-
-                            Dispatcher.Invoke(() =>
-                            {
-                                deletedFiles.Add(file);
-                                Files.Remove(file);
-                                progressBar.Value = i + 1;
-                            });
-                        }
-                    }, _cancellationTokenSource.Token);
-
-                    uIUpdate .RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
-
-                    if (wasCancelled)
-                    {
-                        MessageBox.Show("Eliminación cancelada.");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Eliminación completada.");
-                    }
+                    MessageBox.Show("No hay archivos para eliminar.");
+                    return;
                 }
+
+                UIUpdate uiUpdate = new UIUpdate();
+                uiUpdate.PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
+
+                bool wasCancelled = false;
+
+                // Validar los RadioButton en el hilo de la interfaz
+                bool isSimpleChecked = radioButtonSimple.IsChecked == true;
+                bool isGutmanChecked = radioButtonGutman.IsChecked == true;
+
+                await Task.Run(async () =>
+                {
+                DeletionService deletion = new DeletionService();
+
+                for (int i = 0; i < itemsToRemove.Count; i++)
+                {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        wasCancelled = true;
+                        break;
+                    }
+
+                    string file = itemsToRemove[i];
+
+                    // Realiza la eliminación en el hilo de fondo
+                    if (isSimpleChecked)
+                    {
+                        deletion.DeleteFiles(file);
+                    }
+                    else if (isGutmanChecked)
+                    {
+                        deletion.GutmanDeleteFiles(file);
+                    }
+
+                        await Dispatcher.InvokeAsync(() =>
+                        {
+                            Files.Remove(file);
+                            progressBar.Value = i + 1;  // Incrementa el valor de la barra de progreso.
+                            progressBar.InvalidateVisual();
+                        });
+                }
+}, _cancellationTokenSource.Token);
+
+
+                uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
+
+                MessageBox.Show(wasCancelled ? "Eliminación cancelada." : "Eliminación completada.");
             }
             catch (Exception ex)
             {
@@ -142,17 +133,14 @@ namespace DataObliterate
             }
         }
 
+
+
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
             _cancellationTokenSource?.Cancel();
-            progressBar.Visibility = Visibility.Collapsed;
+            UIUpdate uiUpdate = new UIUpdate();
+            uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
             MessageBox.Show("Eliminación cancelada.");
-            buttonBrowse.Visibility = Visibility.Visible;
-            buttonBrowseFolder.Visibility = Visibility.Visible;
-            radioButtonSimple.Visibility = Visibility.Visible;
-            radioButtonGutman.Visibility = Visibility.Visible;
-            buttonDelete.Visibility = Visibility.Visible;
-            listBox.Visibility = Visibility.Visible;
         }
     }
 }
