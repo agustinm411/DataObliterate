@@ -16,7 +16,6 @@ namespace DataObliterate
             Files = new ObservableCollection<string>();
             listBox.ItemsSource = Files;
             buttonCancel.Visibility = Visibility.Collapsed;
-//progressLabel.Visibility= Visibility.Collapsed;
         }
 
         private void buttonBrowse_Click(object sender, RoutedEventArgs e)
@@ -81,6 +80,8 @@ namespace DataObliterate
                 }
 
                 UIUpdate uiUpdate = new UIUpdate();
+                int totalItemsToDelete = itemsToRemove.Sum(item => new DeletionService().CountItemsToDelete(item));
+                progressBar.Maximum = totalItemsToDelete;
                 uiUpdate.PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
 
                 bool wasCancelled = false;
@@ -91,37 +92,40 @@ namespace DataObliterate
 
                 await Task.Run(async () =>
                 {
-                DeletionService deletion = new DeletionService();
+                    DeletionService deletion = new DeletionService();
 
-                for (int i = 0; i < itemsToRemove.Count; i++)
-                {
-                    if (_cancellationTokenSource.Token.IsCancellationRequested)
+                    Action incrementProgress = () => Dispatcher.Invoke(() =>
                     {
-                        wasCancelled = true;
-                        break;
-                    }
+                        progressBar.Value += 1;
+                        progressBar.InvalidateVisual();
+                    });
 
-                    string file = itemsToRemove[i];
+                    for (int i = 0; i < itemsToRemove.Count; i++)
+                    {
+                        if (_cancellationTokenSource.Token.IsCancellationRequested)
+                        {
+                            wasCancelled = true;
+                            break;
+                        }
 
-                    // Realiza la eliminación en el hilo de fondo
-                    if (isSimpleChecked)
-                    {
-                        deletion.DeleteFiles(file);
-                    }
-                    else if (isGutmanChecked)
-                    {
-                        deletion.GutmanDeleteFiles(file);
-                    }
+                        string file = itemsToRemove[i];
+
+                        // Realiza la eliminación en el hilo de fondo
+                        if (isSimpleChecked)
+                        {
+                            deletion.DeleteFiles(file, incrementProgress);
+                        }
+                        else if (isGutmanChecked)
+                        {
+                            deletion.GutmanDeleteFiles(file, incrementProgress);
+                        }
 
                         await Dispatcher.InvokeAsync(() =>
                         {
                             Files.Remove(file);
-                            progressBar.Value = i + 1;  // Incrementa el valor de la barra de progreso.
-                            progressBar.InvalidateVisual();
                         });
-                }
-}, _cancellationTokenSource.Token);
-
+                    }
+                }, _cancellationTokenSource.Token);
 
                 uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
 
@@ -132,8 +136,6 @@ namespace DataObliterate
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
-
-
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {

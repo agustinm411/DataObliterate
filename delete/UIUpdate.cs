@@ -13,7 +13,10 @@ namespace DataObliterate
     {
         public void PrepareUIForDeletion(Button buttonBrowse, Button buttonBrowseFolder, RadioButton radioButtonSimple, RadioButton radioButtonGutman, Button buttonDelete, ListBox listBox, Button buttonCancel, ProgressBar progressBar, ObservableCollection<string> files)
         {
-            MessageBox.Show(files.Count.ToString());
+            int totalItemsToDelete = files.Sum(item => new DeletionService().CountItemsToDelete(item));
+            progressBar.Maximum = totalItemsToDelete;
+            progressBar.Value = 0;
+
             buttonBrowse.Visibility = Visibility.Collapsed;
             buttonBrowseFolder.Visibility = Visibility.Collapsed;
             radioButtonSimple.Visibility = Visibility.Collapsed;
@@ -23,8 +26,6 @@ namespace DataObliterate
 
             buttonCancel.Visibility = Visibility.Visible;
             progressBar.Minimum = 0;
-            progressBar.Maximum = files.Count;
-            progressBar.Value = 0;
             progressBar.Visibility = Visibility.Visible;
         }
 

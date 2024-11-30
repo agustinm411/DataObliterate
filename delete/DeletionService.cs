@@ -13,7 +13,28 @@ namespace DataObliterate
     {
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        public void DeleteFiles(string path)
+        public int CountItemsToDelete(string path)
+        {
+            int count = 0;
+
+            if (System.IO.File.Exists(path))
+            {
+                count = 1;
+            }
+            else if (System.IO.Directory.Exists(path))
+            {
+                var directoryInfo = new System.IO.DirectoryInfo(path);
+                count += directoryInfo.GetFiles().Length;
+                foreach (var dir in directoryInfo.GetDirectories())
+                {
+                    count += CountItemsToDelete(dir.FullName);
+                }
+            }
+
+            return count;
+        }
+
+        public void DeleteFiles(string path, Action incrementProgress)
         {
             try
             {
@@ -37,19 +58,21 @@ namespace DataObliterate
                         }
                     }
                     System.IO.File.Delete(path);
+                    incrementProgress();
                 }
                 else if (System.IO.Directory.Exists(path))
                 {
                     var directoryInfo = new System.IO.DirectoryInfo(path);
                     foreach (var file in directoryInfo.GetFiles())
                     {
-                        DeleteFiles(file.FullName);
+                        DeleteFiles(file.FullName, incrementProgress);
                     }
                     foreach (var dir in directoryInfo.GetDirectories())
                     {
-                        DeleteFiles(dir.FullName);
+                        DeleteFiles(dir.FullName, incrementProgress);
                     }
                     System.IO.Directory.Delete(path, true);
+                    incrementProgress();
                 }
             }
             catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32) // ERROR_SHARING_VIOLATION
@@ -62,7 +85,7 @@ namespace DataObliterate
             }
         }
 
-        public void GutmanDeleteFiles(string path)
+        public void GutmanDeleteFiles(string path, Action incrementProgress)
         {
             try
             {
@@ -91,19 +114,21 @@ namespace DataObliterate
                         }
                     }
                     System.IO.File.Delete(path);
+                    incrementProgress();
                 }
                 else if (System.IO.Directory.Exists(path))
                 {
                     var directoryInfo = new System.IO.DirectoryInfo(path);
                     foreach (var file in directoryInfo.GetFiles())
                     {
-                        GutmanDeleteFiles(file.FullName);
+                        GutmanDeleteFiles(file.FullName, incrementProgress);
                     }
                     foreach (var dir in directoryInfo.GetDirectories())
                     {
-                        GutmanDeleteFiles(dir.FullName);
+                        GutmanDeleteFiles(dir.FullName, incrementProgress);
                     }
                     System.IO.Directory.Delete(path, true);
+                    incrementProgress();
                 }
             }
             catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32) // ERROR_SHARING_VIOLATION
