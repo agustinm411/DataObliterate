@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,12 +20,10 @@ namespace DataObliterate
             {
                 if (File.Exists(element))
                 {
-                    // It's a file, add it to the list
                     foundElements.Add(element);
                 }
                 else if (Directory.Exists(element))
                 {
-                    // It's a directory, add all its contents recursively
                     foundElements.AddRange(GetDirectoryContents(element));
                 }
             }
@@ -37,14 +37,11 @@ namespace DataObliterate
 
             try
             {
-                // Add files in the current directory
                 contents.AddRange(Directory.GetFiles(directoryPath));
-
-                // Get subdirectories and add their contents recursively
                 var subdirectories = Directory.GetDirectories(directoryPath);
                 foreach (var subdirectory in subdirectories)
                 {
-                    contents.Add(subdirectory); // Add the subdirectory itself
+                    contents.Add(subdirectory);
                     contents.AddRange(GetDirectoryContents(subdirectory));
                 }
             }
@@ -64,12 +61,10 @@ namespace DataObliterate
             {
                 if (File.Exists(element))
                 {
-                    // It's a file, count it
                     totalCount++;
                 }
                 else if (Directory.Exists(element))
                 {
-                    // It's a directory, count all its contents recursively
                     totalCount += CountDirectoryContents(element);
                 }
             }
@@ -83,14 +78,11 @@ namespace DataObliterate
 
             try
             {
-                // Count files in the current directory
                 count += Directory.GetFiles(directoryPath).Length;
-
-                // Get subdirectories and count their contents recursively
                 var subdirectories = Directory.GetDirectories(directoryPath);
                 foreach (var subdirectory in subdirectories)
                 {
-                    count++; // Count the subdirectory itself
+                    count++;
                     count += CountDirectoryContents(subdirectory);
                 }
             }
@@ -100,6 +92,37 @@ namespace DataObliterate
             }
 
             return count;
+        }
+
+        public bool RequestElevation()
+        {
+            try
+            {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                bool isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+
+                if (isAdmin)
+                {
+                    return true;
+                }
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = Process.GetCurrentProcess().MainModule.FileName,
+                    Verb = "runas"
+                };
+
+                Process.Start(startInfo);
+                Environment.Exit(0);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Elevation request failed: {ex.Message}");
+                return false;
+            }
         }
 
     }

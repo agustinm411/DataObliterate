@@ -10,9 +10,11 @@ namespace DataObliterate
     {
         public ObservableCollection<string> Files { get; set; }
         int totalItemsToDelete;
+        Elements elements = new Elements();
         public MainWindow()
         {
             InitializeComponent();
+elements.RequestElevation();
             Files = new ObservableCollection<string>();
             listBox.ItemsSource = Files;
             buttonCancel.Visibility = Visibility.Collapsed;
@@ -69,7 +71,7 @@ namespace DataObliterate
             _cancellationTokenSource = new CancellationTokenSource();
             try
             {
-                Elements elements = new Elements();
+
                 bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?");
                 if (!isConfirmed) return;
                 var itemsToRemove = new List<string>(Files);

@@ -52,7 +52,7 @@ namespace DataObliterate
                     incrementProgress();
                 }
             }
-            catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32) // ERROR_SHARING_VIOLATION
+            catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32)
             {
                 MessageBox.Show("El archivo está siendo utilizado por otro proceso: " + path);
             }
@@ -106,7 +106,7 @@ namespace DataObliterate
                     incrementProgress();
                 }
             }
-            catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32) // ERROR_SHARING_VIOLATION
+            catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32)
             {
                 MessageBox.Show("El archivo está siendo utilizado por otro proceso: " + path);
             }
