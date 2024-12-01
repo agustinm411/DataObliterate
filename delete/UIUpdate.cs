@@ -13,7 +13,11 @@ namespace DataObliterate
     {
         public void PrepareUIForDeletion(Button buttonBrowse, Button buttonBrowseFolder, RadioButton radioButtonSimple, RadioButton radioButtonGutman, Button buttonDelete, ListBox listBox, Button buttonCancel, ProgressBar progressBar, ObservableCollection<string> files)
         {
-            int totalItemsToDelete = files.Sum(item => new DeletionService().CountItemsToDelete(item));
+Elements elements = new Elements();
+            List<string> ListElements = new List<string>(files);
+                        int totalItemsToDelete = elements.CountFilesAndFolders(ListElements);
+            MessageBox.Show(totalItemsToDelete.ToString());
+
             progressBar.Maximum = totalItemsToDelete;
             progressBar.Value = 0;
 

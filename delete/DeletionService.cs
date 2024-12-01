@@ -13,56 +13,33 @@ namespace DataObliterate
     {
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        public int CountItemsToDelete(string path)
-        {
-            int count = 0;
-
-            if (System.IO.File.Exists(path))
-            {
-                count = 1;
-            }
-            else if (System.IO.Directory.Exists(path))
-            {
-                var directoryInfo = new System.IO.DirectoryInfo(path);
-                count += directoryInfo.GetFiles().Length;
-                foreach (var dir in directoryInfo.GetDirectories())
-                {
-                    count += CountItemsToDelete(dir.FullName);
-                }
-            }
-
-            return count;
-        }
-
         public void DeleteFiles(string path, Action incrementProgress)
         {
             try
             {
-                if (System.IO.File.Exists(path))
+                if (File.Exists(path))
                 {
-                    var fileInfo = new System.IO.FileInfo(path);
+                    var fileInfo = new FileInfo(path);
                     long length = fileInfo.Length;
 
-                    using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Write))
+                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Write))
                     {
                         byte[] buffer = new byte[1024];
                         for (long i = 0; i < length; i += buffer.Length)
                         {
                             if (_cancellationTokenSource.Token.IsCancellationRequested)
                             {
-                                // Si la operación se cancela, salimos del método y cerramos el flujo
-                                stream.Close();
                                 return;
                             }
                             stream.Write(buffer, 0, buffer.Length);
                         }
                     }
-                    System.IO.File.Delete(path);
+                    File.Delete(path);
                     incrementProgress();
                 }
-                else if (System.IO.Directory.Exists(path))
+                else if (Directory.Exists(path))
                 {
-                    var directoryInfo = new System.IO.DirectoryInfo(path);
+                    var directoryInfo = new DirectoryInfo(path);
                     foreach (var file in directoryInfo.GetFiles())
                     {
                         DeleteFiles(file.FullName, incrementProgress);
@@ -71,7 +48,7 @@ namespace DataObliterate
                     {
                         DeleteFiles(dir.FullName, incrementProgress);
                     }
-                    System.IO.Directory.Delete(path, true);
+                    Directory.Delete(path, true);
                     incrementProgress();
                 }
             }
@@ -89,23 +66,21 @@ namespace DataObliterate
         {
             try
             {
-                if (System.IO.File.Exists(path))
+                if (File.Exists(path))
                 {
-                    var fileInfo = new System.IO.FileInfo(path);
+                    var fileInfo = new FileInfo(path);
                     long length = fileInfo.Length;
                     Random random = new Random();
 
                     for (int pass = 0; pass < 35; pass++)
                     {
-                        using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Write))
+                        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Write))
                         {
                             byte[] buffer = new byte[1024];
                             for (long i = 0; i < length; i += buffer.Length)
                             {
                                 if (_cancellationTokenSource.Token.IsCancellationRequested)
                                 {
-                                    // Si la operación se cancela, salimos del método y cerramos el flujo
-                                    stream.Close();
                                     return;
                                 }
                                 random.NextBytes(buffer);
@@ -113,12 +88,12 @@ namespace DataObliterate
                             }
                         }
                     }
-                    System.IO.File.Delete(path);
+                    File.Delete(path);
                     incrementProgress();
                 }
-                else if (System.IO.Directory.Exists(path))
+                else if (Directory.Exists(path))
                 {
-                    var directoryInfo = new System.IO.DirectoryInfo(path);
+                    var directoryInfo = new DirectoryInfo(path);
                     foreach (var file in directoryInfo.GetFiles())
                     {
                         GutmanDeleteFiles(file.FullName, incrementProgress);
@@ -127,7 +102,7 @@ namespace DataObliterate
                     {
                         GutmanDeleteFiles(dir.FullName, incrementProgress);
                     }
-                    System.IO.Directory.Delete(path, true);
+                    Directory.Delete(path, true);
                     incrementProgress();
                 }
             }

@@ -9,7 +9,7 @@ namespace DataObliterate
     public partial class MainWindow : Window
     {
         public ObservableCollection<string> Files { get; set; }
-
+        int totalItemsToDelete;
         public MainWindow()
         {
             InitializeComponent();
@@ -69,19 +69,19 @@ namespace DataObliterate
             _cancellationTokenSource = new CancellationTokenSource();
             try
             {
+                Elements elements = new Elements();
                 bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?");
                 if (!isConfirmed) return;
-
                 var itemsToRemove = new List<string>(Files);
-                if (itemsToRemove.Count == 0)
+                totalItemsToDelete = elements.CountFilesAndFolders(itemsToRemove);
+                if (totalItemsToDelete == 0)
                 {
                     MessageBox.Show("No hay archivos para eliminar.");
                     return;
                 }
 
                 UIUpdate uiUpdate = new UIUpdate();
-                int totalItemsToDelete = itemsToRemove.Sum(item => new DeletionService().CountItemsToDelete(item));
-                progressBar.Maximum = totalItemsToDelete;
+                                progressBar.Maximum = totalItemsToDelete;
                 uiUpdate.PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
 
                 bool wasCancelled = false;
