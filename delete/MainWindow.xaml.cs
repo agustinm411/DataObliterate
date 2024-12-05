@@ -68,10 +68,9 @@ elements.RequestElevation();
 
         private async void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            try
+                        try
             {
-
+                _cancellationTokenSource = new CancellationTokenSource();
                 bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?");
                 if (!isConfirmed) return;
                 var itemsToRemove = new List<string>(Files);
@@ -137,11 +136,19 @@ elements.RequestElevation();
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
-        }
+            finally
+            {
+                _cancellationTokenSource?.Dispose(); // Asegúrate de liberar siempre el token
+            }
+                    }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            _cancellationTokenSource?.Cancel();
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose(); // Liberar recursos del token de cancelación
+            }
             UIUpdate uiUpdate = new UIUpdate();
             uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
             MessageBox.Show("Eliminación cancelada.");
