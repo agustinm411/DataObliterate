@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Collections.ObjectModel;
 
-namespace DataObliterate
+namespace DeletionMaster
 {
     public class UIUpdate
     {

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace DataObliterate
+namespace DeletionMaster
 {
     public class DeletionService
     {
@@ -52,8 +52,22 @@ namespace DataObliterate
                     incrementProgress();
                 }
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show("No tienes permiso para acceder o eliminar: " + path + "\n" + ex.Message);
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show("La ruta es demasiado larga: " + path + "\n" + ex.Message);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show("El directorio no existe o fue eliminado: " + path + "\n" + ex.Message);
+            }
             catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32)
             {
+                                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 MessageBox.Show("El archivo está siendo utilizado por otro proceso: " + path);
             }
             catch (Exception ex)
@@ -106,8 +120,22 @@ namespace DataObliterate
                     incrementProgress();
                 }
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show("No tienes permiso para acceder o eliminar: " + path + "\n" + ex.Message);
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show("La ruta es demasiado larga: " + path + "\n" + ex.Message);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show("El directorio no existe o fue eliminado: " + path + "\n" + ex.Message);
+            }
             catch (IOException ex) when ((ex.HResult & 0x0000FFFF) == 32)
             {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 MessageBox.Show("El archivo está siendo utilizado por otro proceso: " + path);
             }
             catch (Exception ex)

@@ -3,28 +3,55 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace DataObliterate
+namespace DeletionMaster
 {
     public class Elements
     {
-
         public List<string> GetFilesAndFolders(List<string> elements)
         {
             List<string> foundElements = new List<string>();
-
             foreach (var element in elements)
             {
-                if (File.Exists(element))
+                try
                 {
-                    foundElements.Add(element);
+                    if (File.Exists(element))
+                    {
+                        foundElements.Add(element);
+                    }
+                    else if (Directory.Exists(element))
+                    {
+                        foundElements.AddRange(GetDirectoryContents(element));
+                    }
                 }
-                else if (Directory.Exists(element))
+                catch (UnauthorizedAccessException ex)
                 {
-                    foundElements.AddRange(GetDirectoryContents(element));
+                    MessageBox.Show($"No se tiene acceso a {element}:\n{ex.Message}", "Error de acceso", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (PathTooLongException ex)
+                {
+                    MessageBox.Show($"La ruta es demasiado larga: {element}:\n{ex.Message}", "Error de ruta", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    MessageBox.Show($"El directorio no existe: {element}:\n{ex.Message}", "Error de directorio", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show($"Error de entrada/salida al procesar {element}:\n{ex.Message}", "Error de E/S", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (SecurityException ex)
+                {
+                    MessageBox.Show($"Restricción de seguridad al intentar acceder a {element}:\n{ex.Message}", "Error de seguridad", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error inesperado al procesar {element}:\n{ex.Message}", "Error desconocido", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -47,7 +74,27 @@ namespace DataObliterate
             }
             catch (UnauthorizedAccessException ex)
             {
-                Console.WriteLine($"Access denied to {directoryPath}: {ex.Message}");
+                MessageBox.Show($"No se tiene acceso al directorio {directoryPath}:\n{ex.Message}", "Error de acceso", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show($"La ruta del directorio es demasiado larga:\n{directoryPath}\n{ex.Message}", "Error de ruta", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show($"El directorio no existe:\n{directoryPath}\n{ex.Message}", "Error de directorio", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Error de entrada/salida en el directorio {directoryPath}:\n{ex.Message}", "Error de E/S", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (SecurityException ex)
+            {
+                MessageBox.Show($"Restricción de seguridad al intentar acceder al directorio {directoryPath}:\n{ex.Message}", "Error de seguridad", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inesperado al procesar el directorio {directoryPath}:\n{ex.Message}", "Error desconocido", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return contents;
@@ -59,13 +106,40 @@ namespace DataObliterate
 
             foreach (var element in elements)
             {
-                if (File.Exists(element))
+                try
                 {
-                    totalCount++;
+                    if (File.Exists(element))
+                    {
+                        totalCount++;
+                    }
+                    else if (Directory.Exists(element))
+                    {
+                        totalCount += CountDirectoryContents(element);
+                    }
                 }
-                else if (Directory.Exists(element))
+                catch (UnauthorizedAccessException ex)
                 {
-                    totalCount += CountDirectoryContents(element);
+                    MessageBox.Show($"No se tiene acceso a {element}:\n{ex.Message}", "Error de acceso", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (PathTooLongException ex)
+                {
+                    MessageBox.Show($"La ruta es demasiado larga:\n{element}\n{ex.Message}", "Error de ruta", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    MessageBox.Show($"El directorio no existe:\n{element}\n{ex.Message}", "Error de directorio", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show($"Error de entrada/salida al procesar {element}:\n{ex.Message}", "Error de E/S", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (SecurityException ex)
+                {
+                    MessageBox.Show($"Restricción de seguridad al intentar acceder a {element}:\n{ex.Message}", "Error de seguridad", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error inesperado al procesar {element}:\n{ex.Message}", "Error desconocido", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -88,7 +162,27 @@ namespace DataObliterate
             }
             catch (UnauthorizedAccessException ex)
             {
-                Console.WriteLine($"Access denied to {directoryPath}: {ex.Message}");
+                MessageBox.Show($"No se tiene acceso al directorio {directoryPath}:\n{ex.Message}", "Error de acceso", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show($"La ruta del directorio es demasiado larga:\n{directoryPath}\n{ex.Message}", "Error de ruta", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show($"El directorio no existe:\n{directoryPath}\n{ex.Message}", "Error de directorio", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Error de entrada/salida al procesar el directorio {directoryPath}:\n{ex.Message}", "Error de E/S", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (SecurityException ex)
+            {
+                MessageBox.Show($"Restricción de seguridad al intentar acceder al directorio {directoryPath}:\n{ex.Message}", "Error de seguridad", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inesperado al procesar el directorio {directoryPath}:\n{ex.Message}", "Error desconocido", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return count;
@@ -106,6 +200,7 @@ namespace DataObliterate
                 {
                     return true;
                 }
+
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     UseShellExecute = true,
@@ -118,11 +213,28 @@ namespace DataObliterate
                 Environment.Exit(0);
                 return true;
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show($"No se pudo solicitar permisos de administrador:\n{ex.Message}", "Error de permisos", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                MessageBox.Show($"Error del sistema al intentar ejecutar con privilegios elevados:\n{ex.Message}", "Error del sistema", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show($"Operación inválida al solicitar permisos de administrador:\n{ex.Message}", "Error de operación", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show($"El archivo ejecutable principal no se encontró:\n{ex.Message}", "Error de archivo faltante", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             catch (Exception ex)
             {
-                Console.WriteLine($"Elevation request failed: {ex.Message}");
-                return false;
+                MessageBox.Show($"Error inesperado al intentar solicitar permisos de administrador:\n{ex.Message}", "Error desconocido", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            return false;
         }
 
     }

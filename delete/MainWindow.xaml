@@ -1,27 +1,55 @@
-﻿<Window x:Class="DataObliterate.MainWindow"
+﻿<Window x:Class="DeletionMaster.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:delete"
-        mc:Ignorable="d"
-        Title="DataObliterate" Height="450" Width="800">
-    <Grid Cursor="Arrow">
-        <StackPanel Margin="0,-1,0,1">
-            <Label x:Name="lblList" Content="archivos y carpetas que se eliminarán"/>
-            <ListBox x:Name="listBox" Height="100" d:ItemsSource="{d:SampleData ItemCount=5}"/>
-            <Button x:Name="buttonBrowse" Content="seleccionar archivos" Click="buttonBrowse_Click"/>
-            <Button x:Name="buttonBrowseFolder" Content="seleccionar carpetas" Click="buttonBrowseFolder_Click"/>
+        Title="DeletionMaster" Height="450" Width="800">
+    <Grid>
+        <!-- Definición de filas y columnas -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Texto descriptivo -->
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                   Text="Seleccione los archivos o carpetas que desea eliminar."
+                   FontSize="16" Margin="10" />
+
+        <!-- Botones de selección -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Margin="10">
+            <Button Name="buttonBrowse" Content="Seleccionar Archivos"
+                    Click="buttonBrowse_Click" Margin="5" />
+            <Button Name="buttonBrowseFolder" Content="Seleccionar Carpetas"
+                    Click="buttonBrowseFolder_Click" Margin="5" />
         </StackPanel>
-        <StackPanel>
-            <RadioButton x:Name="radioButtonSimple" Content="método simple(sobreescritura con ceros)" GroupName="deleteGroup" IsChecked="True"/>
-            <RadioButton x:Name="radioButtonGutman" Content="método Gutman(sobreescritura aleatoria de 35 pasos)" GroupName="deleteGroup"/>
+
+        <!-- Lista de archivos -->
+        <ListBox Name="listBox" Grid.Row="1" Grid.Column="0" Margin="10"
+                 AutomationProperties.Name="Lista de archivos y carpetas seleccionados"
+                 AllowDrop="True" />
+
+        <!-- Controles de progreso y eliminación -->
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    VerticalAlignment="Center" Margin="10">
+            <ProgressBar Name="progressBar" Width="400" Height="20" Visibility="Collapsed" />
+            <TextBlock Name="progressText" Text="" Margin="10,0,0,0"
+                       VerticalAlignment="Center" />
+            <Button Name="buttonDelete" Content="Eliminar" Click="buttonDelete_Click"
+                    Margin="10" />
+            <Button Name="buttonCancel" Content="Cancelar" Click="buttonCancel_Click"
+                    Visibility="Collapsed" Margin="10" />
         </StackPanel>
-        <StackPanel>
-            <Button x:Name="buttonDelete" Content="eliminar" Click="buttonDelete_Click"/>
-            <Button x:Name="buttonAbout" Content="acerca de"/>
-            <Button x:Name="buttonCancel" Content="cancelar" IsCancel="True" Click="buttonCancel_Click"/>
+
+        <!-- RadioButtons para seleccionar tipo de eliminación -->
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" Margin="10">
+            <RadioButton Name="radioButtonSimple" Content="Eliminación Simple"
+                         GroupName="DeletionType" IsChecked="True" Margin="5" />
+            <RadioButton Name="radioButtonGutman" Content="Eliminación Avanzada (Gutman)"
+                         GroupName="DeletionType" Margin="5" />
         </StackPanel>
-        <ProgressBar x:Name="progressBar" Height="10" Width="100" Cursor="Arrow" Margin="350,212,350,212" Visibility="Collapsed"/>
     </Grid>
 </Window>

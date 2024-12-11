@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace DataObliterate
+namespace DeletionMaster
 {
     public partial class MainWindow : Window
     {
