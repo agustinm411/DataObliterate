@@ -87,7 +87,6 @@ elements.RequestElevation();
 
                 bool wasCancelled = false;
 
-                // Validar los RadioButton en el hilo de la interfaz
                 bool isSimpleChecked = radioButtonSimple.IsChecked == true;
                 bool isGutmanChecked = radioButtonGutman.IsChecked == true;
 
@@ -111,7 +110,7 @@ elements.RequestElevation();
 
                         string file = itemsToRemove[i];
 
-                        // Realiza la eliminación en el hilo de fondo
+
                         if (isSimpleChecked)
                         {
                             deletion.DeleteFiles(file, incrementProgress);
@@ -138,7 +137,7 @@ elements.RequestElevation();
             }
             finally
             {
-                _cancellationTokenSource?.Dispose(); // Asegúrate de liberar siempre el token
+                _cancellationTokenSource?.Dispose();
             }
                     }
 
@@ -147,11 +146,26 @@ elements.RequestElevation();
             if (_cancellationTokenSource != null)
             {
                 _cancellationTokenSource.Cancel();
-                _cancellationTokenSource.Dispose(); // Liberar recursos del token de cancelación
+                _cancellationTokenSource.Dispose();
             }
             UIUpdate uiUpdate = new UIUpdate();
             uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
             MessageBox.Show("Eliminación cancelada.");
         }
+
+        private void buttonAbout_Click(object sender, RoutedEventArgs e)
+        {
+            string aboutMessage = "Esta es la versión 0.01 beta 1 del software.\n" +
+                                  "Desarrollado por Agustín Martínez.\n" +
+                                  "Es un software de código abierto con licencia GPL v2.\n\n" +
+                                  "Bajo esta licencia, tienes la libertad de:\n" +
+                                  "- Usar el software para cualquier propósito.\n" +
+                                  "- Estudiar cómo funciona y modificarlo.\n" +
+                                  "- Redistribuir copias del software.\n" +
+                                  "- Mejorar el software y compartir tus mejoras.\n\n" +
+                                  "Consulta el texto completo de la licencia para más detalles.";
+            MessageBox.Show(aboutMessage, "Acerca de DeletionMaster", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
     }
 }

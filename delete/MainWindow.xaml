@@ -42,6 +42,7 @@
                     Margin="10" />
             <Button Name="buttonCancel" Content="Cancelar" Click="buttonCancel_Click"
                     Visibility="Collapsed" Margin="10" />
+            <Button x:Name="buttonAbout" Content="Acerca de" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Width="100" Click="buttonAbout_Click"/>
         </StackPanel>
 
         <!-- RadioButtons para seleccionar tipo de eliminación -->
