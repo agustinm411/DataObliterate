@@ -210,6 +210,7 @@ PowerShellCommand command = new PowerShellCommand();
         {
 PowerShellCommand command = new PowerShellCommand();
             await command.ExecutePowerShellCommandAsync("Dism.exe /online /Cleanup-Image /StartComponentCleanup\r\n");
-                    }
+            MessageBox.Show("La carpeta windowsSXS se a limpiado correctamente.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 }
