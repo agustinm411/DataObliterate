@@ -203,7 +203,7 @@ PowerShellCommand command = new PowerShellCommand();
 
         private void AtaSecureErase_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("esta función aún no está implementada. Estará en la próxima versión.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private async void CleanWindowsSXS_Click(object sender, RoutedEventArgs e)
