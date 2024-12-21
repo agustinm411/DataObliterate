@@ -3,6 +3,10 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO;
+using Microsoft.Win32;
+using System.Management.Automation.Runspaces;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DeletionMaster
 {
@@ -167,5 +171,45 @@ elements.RequestElevation();
             MessageBox.Show(aboutMessage, "Acerca de DeletionMaster", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private async void CleanReservedSpace_Click(object sender, RoutedEventArgs e)
+        {
+PowerShellCommand command = new PowerShellCommand();
+                string result = await command.ExecutePowerShellCommandAsync("DISM.exe /Online /Get-ReservedStorageState");
+            if (!result.Contains("deshabilitado", StringComparison.OrdinalIgnoreCase))
+            {
+                await command.ExecutePowerShellCommandAsync("DISM.exe /Online /Set-ReservedStorageState /State:Disabled");
+                MessageBox.Show("Almacenamiento reservado deshabilitado con éxito.");
+            }
+            else
+            {
+                MessageBox.Show("El almacenamiento reservado ya está desactivado.");
+            }
+        }
+
+        private async void CleanHibernateFile_Click(object sender, RoutedEventArgs e)
+        {
+PowerShellCommand command = new PowerShellCommand();
+            string hibernationFilePath = @"C:\hiberfil.sys";
+            if (File.Exists(hibernationFilePath))
+            {
+                await command.ExecutePowerShellCommandAsync("powercfg -h off");
+                MessageBox.Show("El archivo de hibernación ha sido eliminado correctamente.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("El archivo de hibernación no existe. Ya fue eliminado.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+        }
+
+        private void AtaSecureErase_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void CleanWindowsSXS_Click(object sender, RoutedEventArgs e)
+        {
+PowerShellCommand command = new PowerShellCommand();
+            await command.ExecutePowerShellCommandAsync("Dism.exe /online /Cleanup-Image /StartComponentCleanup\r\n");
+                    }
     }
 }

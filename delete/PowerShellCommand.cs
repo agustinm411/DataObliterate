@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,11 +12,14 @@ namespace DeletionMaster
 {
     public class PowerShellCommand
     {
-        public async Task ExecutePowerShellCommandAsync(string command)
+        public async Task<string> ExecutePowerShellCommandAsync(string command)
         {
+            string output = string.Empty;
+            Window progressWindow = null;
+            ProgressBar progressBar = null;
             try
             {
-                ProgressBar progressBar = new ProgressBar
+                progressBar = new ProgressBar
                 {
                     Minimum = 0,
                     Maximum = 100,
@@ -23,7 +27,7 @@ namespace DeletionMaster
                     Visibility = Visibility.Visible
                 };
 
-                Window progressWindow = new Window
+                progressWindow = new Window
                 {
                     Title = "Ejecución en progreso",
                     Content = progressBar,
@@ -34,38 +38,63 @@ namespace DeletionMaster
 
                 progressWindow.Show();
 
-                await Task.Run(() =>
+                // Ejecutar el comando de PowerShell en una tarea asíncrona
+                output = await Task.Run(() =>
                 {
                     using (PowerShell powerShell = PowerShell.Create())
                     {
-                        powerShell.AddScript(command);
-
-                        powerShell.Streams.Progress.DataAdded += (sender, e) =>
+                        try
                         {
-                            var progressRecord = ((PSDataCollection<ProgressRecord>)sender)[e.Index];
-                            Application.Current.Dispatcher.Invoke(() =>
+                            powerShell.AddScript(command);
+
+                            // Manejo de progreso
+                            powerShell.Streams.Progress.DataAdded += (sender, e) =>
                             {
-                                progressBar.Value = progressRecord.PercentComplete;
-                            });
-                        };
+                                var progressRecord = ((PSDataCollection<ProgressRecord>)sender)[e.Index];
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    progressBar.Value = progressRecord.PercentComplete;
+                                });
+                            };
 
-                        var results = powerShell.Invoke();
+                            // Invocar el comando
+                            var results = powerShell.Invoke();
 
-                        if (powerShell.HadErrors)
+                            // Verificar si hubo errores
+                            if (powerShell.HadErrors)
+                            {
+                                throw new Exception("Se produjo un error durante la ejecución del comando de PowerShell.");
+                            }
+
+                            // Recoger y concatenar la salida del comando
+                            StringBuilder stringBuilder = new StringBuilder();
+                            foreach (var result in results)
+                            {
+                                stringBuilder.AppendLine(result.ToString());
+                            }
+
+                            return stringBuilder.ToString();
+                        }
+                        catch (Exception ex)
                         {
-                            throw new Exception("Se produjo un error durante la ejecución del comando de PowerShell.");
+                            throw new Exception($"Error al procesar el comando de PowerShell: {ex.Message}");
                         }
                     }
                 });
 
                 progressWindow.Close();
 
-                MessageBox.Show("La operación ha finalizado con éxito.", "Operación completada", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al ejecutar el comando de PowerShell: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                progressWindow?.Close();
+            }
+
+            return output;
         }
     }
 }
