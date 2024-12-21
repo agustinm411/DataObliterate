@@ -16,8 +16,6 @@ namespace DeletionMaster
 Elements elements = new Elements();
             List<string> ListElements = new List<string>(files);
                         int totalItemsToDelete = elements.CountFilesAndFolders(ListElements);
-            MessageBox.Show(totalItemsToDelete.ToString());
-
             progressBar.Maximum = totalItemsToDelete;
             progressBar.Value = 0;
 
