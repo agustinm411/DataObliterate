@@ -51,9 +51,9 @@ namespace DeletionMaster
             return null;
         }
 
-        public static bool Confirm(string message)
+        public static bool Confirm(string message, string title)
         {
-            MessageBoxResult result = MessageBox.Show(message, "Confirmar la supresión de archivos", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
             return result == MessageBoxResult.Yes;
         }
 

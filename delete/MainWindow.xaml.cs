@@ -75,7 +75,7 @@ elements.RequestElevation();
                         try
             {
                 _cancellationTokenSource = new CancellationTokenSource();
-                bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?");
+                bool isConfirmed = DialogService.Confirm("¿Estás seguro de que deseas eliminar los archivos seleccionados?", "confirmar la supresión de archivos");
                 if (!isConfirmed) return;
                 var itemsToRemove = new List<string>(Files);
                 totalItemsToDelete = elements.CountFilesAndFolders(itemsToRemove);
@@ -87,7 +87,7 @@ elements.RequestElevation();
 
                 UIUpdate uiUpdate = new UIUpdate();
                                 progressBar.Maximum = totalItemsToDelete;
-                uiUpdate.PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, Files);
+                uiUpdate.PrepareUIForDeletion(buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, buttonCancel, progressBar, menu, Files);
 
                 bool wasCancelled = false;
 
@@ -131,7 +131,7 @@ elements.RequestElevation();
                     }
                 }, _cancellationTokenSource.Token);
 
-                uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
+                uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, menu);
 
                 MessageBox.Show(wasCancelled ? "Eliminación cancelada." : "Eliminación completada.");
             }
@@ -153,7 +153,7 @@ elements.RequestElevation();
                 _cancellationTokenSource.Dispose();
             }
             UIUpdate uiUpdate = new UIUpdate();
-            uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox);
+            uiUpdate.RestoreUIAfterDeletion(progressBar, buttonCancel, buttonBrowse, buttonBrowseFolder, radioButtonSimple, radioButtonGutman, buttonDelete, listBox, menu);
             MessageBox.Show("Eliminación cancelada.");
         }
 

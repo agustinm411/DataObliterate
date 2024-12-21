@@ -51,7 +51,7 @@
                          GroupName="DeletionType" IsChecked="True" Margin="5" />
             <RadioButton Name="radioButtonGutman" Content="Eliminación Avanzada (Gutman)"
                          GroupName="DeletionType" Margin="5" />
-            <Menu>
+            <Menu x:Name="menu">
                 <MenuItem Header="Opciones adicionales de limpieza">
                     <MenuItem x:Name="CleanReservedSpace" Header="Desactivar espacio reservado" Click="CleanReservedSpace_Click"/>
                     <MenuItem x:Name="CleanHibernateFile" Header="eliminar archivo de hibernación" Click="CleanHibernateFile_Click"/>
